@@ -20,8 +20,12 @@ import javafx.scene.paint.Color;
  */
 public class GameBoard {
 
+	private final int VORTEX_SPACING = 35;
 	private static final int NUMBER_OF_SLOW_CARS = 3;
+	private static int numSlowCars = 0;
+
 	private static final int NUMBER_OF_TESLA_CARS = 2;
+	private static int numTeslaCars = 0;
 
 	private static final int MAX_VORTEX_CARS_PER_RING = 6;
 	private static final int MIN_VORTEX_CARS_PER_RING = 2;
@@ -39,6 +43,7 @@ public class GameBoard {
 	 */
 	private final List<Car> cars = new ArrayList<>();
 	private final List<Car> vortexCars = new ArrayList<>();
+	private final List<BallParticle> ballParticles = new ArrayList<>();
 
 	/**
 	 * The player object with player's car.
@@ -91,21 +96,28 @@ public class GameBoard {
 	 * them to the cars list.
 	 */
 	private void createCars() {
-		if (gameTick == 0) {
-			for (int i = 0; i < NUMBER_OF_SLOW_CARS; i++) {
-				this.cars.add(new SlowCar(this.size));
-			}
-			for (int i = 0; i < NUMBER_OF_TESLA_CARS; i++) {
-				this.cars.add(new FastCar(this.size));
-			}
+		if (gameTick % 5 == 0) {
+			ballParticles.add(new BallParticle(this.size, player.getCar().getPosition()));
 		}
 
-		if (gameTick % 20 == 0) {
-			if (gameTick >= 40) {
+		if (gameTick % VORTEX_SPACING == 0) {
+			if (gameTick >= VORTEX_SPACING * 2) {
 				score++;
 //				if (score > highScore) {
 //					highScore = score;
 //				}
+			}
+
+			switch (randomInt(0, 5)) {
+				case 0:
+					if (numSlowCars < NUMBER_OF_SLOW_CARS) {
+						this.cars.add(new SlowCar(this.size));
+					}
+					break;
+				case 1:
+					if (numTeslaCars < NUMBER_OF_TESLA_CARS) {
+						this.cars.add(new FastCar(this.size));
+					}
 			}
 
 			Double modifier = randomDouble(0.0, 359.0);
@@ -235,6 +247,10 @@ public class GameBoard {
 		stopVideo();
 		stopMusic();
 		this.running = false;
+
+		this.getCars().clear();
+		numSlowCars = 0;
+		numTeslaCars = 0;
 	}
 
 	/**
@@ -277,6 +293,17 @@ public class GameBoard {
 		gameTick++;
 		createCars();
 
+		for (int i = 0; i < ballParticles.size(); i++) {
+			BallParticle bp = ballParticles.get(i);
+
+			if (bp.isOnBoard()) {
+				bp.move();
+			} else {
+				ballParticles.remove(bp);
+				i--;
+			}
+		}
+
 		// update the positions of the player car and the autonomous cars
 		for (Car car : this.cars) {
 			car.drive(size);
@@ -313,7 +340,9 @@ public class GameBoard {
 		}
 
 		// iterate through all cars (except player car) and check if it is crunched
-		for (Car car : cars) {
+		for (int i = 0; i < cars.size(); i++) {
+			Car car = cars.get(i);
+
 			if (car.isCrunched()) {
 				// because there is no need to check for a collision
 				continue;
@@ -352,6 +381,9 @@ public class GameBoard {
 				if (getPlayerCar().isCrunched()) {
 					stopGame();
 					gameOutcome = GameOutcome.LOST;
+				} else {
+					cars.remove(loser);
+					i--;
 				}
 			}
 		}
@@ -383,6 +415,10 @@ public class GameBoard {
 
 	public int getScore() {
 		return score;
+	}
+
+	public List<BallParticle> getBallParticles() {
+		return ballParticles;
 	}
 
 //	public int getHighScore() {

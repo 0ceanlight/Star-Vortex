@@ -15,10 +15,7 @@ public class BallCar extends Car {
 
     public BallCar(Dimension2D gameBoardSize) {
         super(gameBoardSize);
-        setSize(new Dimension2D(30, 30));
-//        setMinSpeed(MIN_SPEED_FAST_CAR);
-//        setMaxSpeed(MAX_SPEED_FAST_CAR);
-//        setRandomSpeed();
+        setSize(new Dimension2D(35, 35));
         setIconLocation(BALL_CAR_IMAGE_FILE);
     }
 

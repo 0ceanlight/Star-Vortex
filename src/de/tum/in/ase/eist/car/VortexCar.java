@@ -9,7 +9,7 @@ public class VortexCar extends Car {
 
     // TODO: diff colors
     private final Color color;
-    private final int speed = 7;
+    private final int speed = 5;
     private final int MAX_WIDTH = 15;
     private double width = 1.0;
 
@@ -41,7 +41,7 @@ public class VortexCar extends Car {
 
         prevRadius = radius;
         radius += (this.speed * radius) / 100.0;
-        width += radius * radius / 13000.0;
+        width += radius * radius / 15000.0;
     }
 
     public Color getColor() {

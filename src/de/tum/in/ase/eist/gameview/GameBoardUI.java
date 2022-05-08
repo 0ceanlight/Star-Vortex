@@ -205,6 +205,10 @@ public class GameBoardUI extends Canvas {
 		getGraphicsContext2D().setFill(BACKGROUND_COLOR);
 		getGraphicsContext2D().fillRect(0, 0, getWidth(), getHeight());
 
+		for (Car ballParticle : this.gameBoard.getBallParticles()) {
+			paintBallParticle(ballParticle);
+		}
+
 		for (Car vortexCar : this.gameBoard.getVortexCars()) {
 			paintVortexCar(vortexCar);
 		}
@@ -236,6 +240,15 @@ public class GameBoardUI extends Canvas {
 
 		getGraphicsContext2D().drawImage(getImage(car.getIconLocation()), carPosition.getX() - w / 2,
 				carPosition.getY() - h / 2, w, h);
+	}
+
+	private void paintBallParticle(Car car) {
+		Point2D pos = car.getPosition();
+		this.getGraphicsContext2D().setStroke(Color.WHITE);
+
+//		System.out.println(pos.getY() + " " + pos.getX());
+		this.getGraphicsContext2D().strokeArc(pos.getX(), pos.getY(), 2.4, 2.4, 0, 360, ArcType.OPEN);
+		System.out.println(this.gameBoard.getBallParticles().size());
 	}
 
 	private void paintVortexCar(Car car) {
