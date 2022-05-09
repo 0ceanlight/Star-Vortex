@@ -19,7 +19,7 @@ import javafx.scene.paint.Color;
  */
 public class GameBoard {
 
-	private final int VORTEX_SPACING = 35;
+	private final int VORTEX_SPACING = 40;
 	private static final int NUMBER_OF_SLOW_CARS = 3;
 	private static int numSlowCars = 0;
 
@@ -28,7 +28,7 @@ public class GameBoard {
 
 	private static final int MAX_VORTEX_CARS_PER_RING = 6;
 	private static final int MIN_VORTEX_CARS_PER_RING = 2;
-	private static final Double MIN_VORTEX_SPACING = 2.5 * BallCar.RADIAL_BALL_WIDTH;
+	private static final Double MIN_VORTEX_SPACING = 4 * BallCar.RADIAL_BALL_WIDTH;
 	private static final Double MIN_VORTEX_LENGTH = 2 * BallCar.RADIAL_BALL_WIDTH;
 
 	private int score = 0;
@@ -111,31 +111,39 @@ public class GameBoard {
 				case 0:
 					if (numSlowCars < NUMBER_OF_SLOW_CARS) {
 						this.cars.add(new SlowCar(this.size));
+						numSlowCars++;
 					}
 					break;
 				case 1:
 					if (numTeslaCars < NUMBER_OF_TESLA_CARS) {
 						this.cars.add(new FastCar(this.size));
+						numTeslaCars++;
 					}
 			}
 
-			Double modifier = randomDouble(0.0, 359.0);
-			Double startAngle = 0.0;
-			Double endAngle = 360.0 - MIN_VORTEX_SPACING;
+			if (gameTick >= VORTEX_SPACING * 2) {
+				addVortexCar();
+			}
+		}
+	}
 
-			for (int i = 0; i < MAX_VORTEX_CARS_PER_RING; i++) {
-				if (i < MIN_VORTEX_CARS_PER_RING || randomInt(0, 1) == 1) {
-					if (startAngle + MIN_VORTEX_LENGTH <= endAngle) {
-						Double len = randomDouble(MIN_VORTEX_LENGTH, angleLength(startAngle, endAngle));
-						Double newEnd = startAngle + len;
-						this.vortexCars.add(new VortexCar(this.size, Color.WHITE, (startAngle + modifier) % 360, (newEnd + modifier) % 360));
-						startAngle += len;
-					} else {
-						break;
-					}
+	public void addVortexCar() {
+		Double modifier = randomDouble(0.0, 359.0);
+		Double startAngle = 0.0;
+		Double endAngle = 360.0 - MIN_VORTEX_SPACING;
+
+		for (int i = 0; i < MAX_VORTEX_CARS_PER_RING; i++) {
+			if (i < MIN_VORTEX_CARS_PER_RING || randomInt(0, 1) == 1) {
+				if (startAngle + MIN_VORTEX_LENGTH <= endAngle) {
+					Double len = randomDouble(MIN_VORTEX_LENGTH, angleLength(startAngle, endAngle));
+					Double newEnd = startAngle + len;
+					this.vortexCars.add(new VortexCar(this.size, Color.WHITE, (startAngle + modifier) % 360, (newEnd + modifier) % 360));
+					startAngle += len;
+				} else {
+					break;
 				}
-				startAngle += MIN_VORTEX_SPACING;
 			}
+			startAngle += MIN_VORTEX_SPACING;
 		}
 	}
 
@@ -382,6 +390,7 @@ public class GameBoard {
 					gameOutcome = GameOutcome.LOST;
 				} else {
 					cars.remove(loser);
+					this.score += 3;
 					i--;
 				}
 			}
@@ -394,6 +403,10 @@ public class GameBoard {
 	 * @return true if the game is over and the player won, false otherwise
 	 */
 	private boolean isWinner() {
+		if (numTeslaCars < NUMBER_OF_TESLA_CARS || numSlowCars < NUMBER_OF_SLOW_CARS) {
+			return false;
+		}
+
 		for (Car car : getCars()) {
 			if (!car.isCrunched()) {
 				return false;

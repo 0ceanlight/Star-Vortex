@@ -83,7 +83,10 @@ public class GameBoardUI extends Canvas {
 		setupGameBoard();
 		setupImageCache();
 		this.gameToolBar.updateToolBarStatus(false);
-		paint();
+		this.addEventHandler(MouseEvent.MOUSE_MOVED, (MouseEvent moveEvent) -> {
+			this.mouseSteering.mouseMoved(moveEvent);
+		});
+//		paint();
 	}
 
 	private void setupGameBoard() {
@@ -93,10 +96,10 @@ public class GameBoardUI extends Canvas {
 		this.gameBoard.setVideoPlayer(new VideoPlayer());
 		widthProperty().set(size.getWidth());
 		heightProperty().set(size.getHeight());
-		this.mouseSteering = new MouseSteering(this.gameBoard.getPlayerCar());
-		this.addEventHandler(MouseEvent.MOUSE_MOVED, (MouseEvent moveEvent) -> {
-			this.mouseSteering.mouseMoved(moveEvent);
-		});
+		this.mouseSteering = new MouseSteering(this.gameBoard.getPlayerCar(), this);
+//		this.addEventHandler(MouseEvent.MOUSE_MOVED, (MouseEvent moveEvent) -> {
+//			this.mouseSteering.mouseMoved(moveEvent);
+//		});
 
 //		this.addEventHandler(MouseEvent.MOUSE_PRESSED, (MouseEvent clickEvent) -> {
 //			this.mouseSteering.mousePressed(clickEvent);
@@ -175,7 +178,7 @@ public class GameBoardUI extends Canvas {
 			this.gameBoard.update();
 			// when this.gameBoard.getOutcome() is OPEN, do nothing
 			if (this.gameBoard.getGameOutcome() == GameOutcome.LOST) {
-				showAsyncAlert("Oops! You lost.\nScore: " + gameBoard.getScore());
+				showAsyncAlert("Game over!\nScore: " + gameBoard.getScore());
 				this.stopGame();
 			} else if (this.gameBoard.getGameOutcome() == GameOutcome.WON) {
 				showAsyncAlert("Congrats! You won!!");
@@ -200,7 +203,7 @@ public class GameBoardUI extends Canvas {
 	 * Render the graphics of the whole game by iterating through the cars of the
 	 * game board at render each of them individually.
 	 */
-	private void paint() {
+	public void paint() {
 		getGraphicsContext2D().clearRect(0, 0, getWidth(), getHeight());
 		getGraphicsContext2D().setFill(BACKGROUND_COLOR);
 		getGraphicsContext2D().fillRect(0, 0, getWidth(), getHeight());
@@ -233,7 +236,7 @@ public class GameBoardUI extends Canvas {
 				carPosition.getY(), car.getSize().getWidth(), car.getSize().getHeight());
 	}
 
-	private void paintBallCar(Car car) {
+	 public void paintBallCar(Car car) {
 		Point2D carPosition = car.getPosition();
 		Double w = car.getSize().getWidth();
 		Double h = car.getSize().getHeight();
@@ -248,7 +251,6 @@ public class GameBoardUI extends Canvas {
 
 //		System.out.println(pos.getY() + " " + pos.getX());
 		this.getGraphicsContext2D().strokeArc(pos.getX(), pos.getY(), 2.4, 2.4, 0, 360, ArcType.OPEN);
-		System.out.println(this.gameBoard.getBallParticles().size());
 	}
 
 	private void paintVortexCar(Car car) {

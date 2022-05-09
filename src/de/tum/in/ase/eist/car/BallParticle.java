@@ -36,7 +36,6 @@ public class BallParticle extends Car {
 //        if ((x < 0 || x > this.getSize().getWidth()) || (y < 0 || y > this.getSize().getHeight())) {
         if ((x < 0 || x > GameBoardUI.DEFAULT_WIDTH || (y < 0 || y > GameBoardUI.DEFAULT_HEIGHT))) {
             this.isOnBoard = false;
-            System.out.println(this.getSize().getWidth());
         }
 
         this.position = new Point2D(x, y);

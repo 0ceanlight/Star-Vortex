@@ -3,8 +3,10 @@ package de.tum.in.ase.eist;
 import de.tum.in.ase.eist.gameview.GameBoardUI;
 import de.tum.in.ase.eist.gameview.GameToolBar;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -61,6 +63,15 @@ public class BumpersApplication extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setOnCloseRequest(closeEvent -> gameBoardUI.stopGame());
 		primaryStage.show();
+		showAsyncAlert("Welcome to the Space Vortex\n\nYour mission is to successfully guide the orb through the rings\nand avoid enemy spaceships on the way\n - avoid the vortex rings\n - hit enemies on the right\n - control the orb by moving your mouse\n - here we go...");
+	}
+
+	private void showAsyncAlert(String message) {
+		Platform.runLater(() -> {
+			Alert alert = new Alert(Alert.AlertType.INFORMATION);
+			alert.setHeaderText(message);
+			alert.showAndWait();
+		});
 	}
 
 	/**

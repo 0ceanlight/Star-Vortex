@@ -35,7 +35,6 @@ public class VortexCollision extends Collision {
         }
         // 2: vortex radius passed through ball radius
         hasCollided &= vortexCar.getPrevRadius() <= ballCar.getRadius() && vortexCar.getRadius() >= ballCar.getRadius();
-        System.out.println(ballCar.getRadialPos());
         return hasCollided;
     }
 
