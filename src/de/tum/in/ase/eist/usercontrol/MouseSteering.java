@@ -1,6 +1,5 @@
 package de.tum.in.ase.eist.usercontrol;
 
-import de.tum.in.ase.eist.GameBoard;
 import de.tum.in.ase.eist.Point2D;
 import de.tum.in.ase.eist.car.BallCar;
 import de.tum.in.ase.eist.car.Car;

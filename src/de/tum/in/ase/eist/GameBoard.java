@@ -8,7 +8,6 @@ import de.tum.in.ase.eist.audio.AudioPlayerInterface;
 import de.tum.in.ase.eist.car.*;
 import de.tum.in.ase.eist.collision.VortexCollision;
 import de.tum.in.ase.eist.gameview.GameBoardUI;
-import de.tum.in.ase.eist.video.VideoPlayer;
 import de.tum.in.ase.eist.video.VideoPlayerInterface;
 import de.tum.in.ase.eist.collision.Collision;
 import de.tum.in.ase.eist.collision.DefaultCollision;

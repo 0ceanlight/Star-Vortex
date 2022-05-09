@@ -1,7 +1,6 @@
 package de.tum.in.ase.eist.car;
 
 import de.tum.in.ase.eist.Dimension2D;
-import de.tum.in.ase.eist.GameBoard;
 import de.tum.in.ase.eist.Point2D;
 import de.tum.in.ase.eist.gameview.GameBoardUI;
 
