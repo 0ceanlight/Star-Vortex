@@ -85,18 +85,18 @@ public class GameBoardUI extends Canvas {
 		setupImageCache();
 		this.gameToolBar.updateToolBarStatus(false);
 		this.addEventHandler(MouseEvent.MOUSE_MOVED, (MouseEvent moveEvent) -> {
-			this.mouseSteering.mouseMoved(moveEvent);
+			this.mouseSteering.mouseMoved(moveEvent, MIDPOINT, EFFECTIVE_RADIUS);
 		});
 	}
 
 	private void setupGameBoard() {
 		Dimension2D size = getPreferredSize();
-		this.gameBoard = new GameBoard(size);
+		this.gameBoard = new GameBoard(size, EFFECTIVE_RADIUS, FADE_IN_RADIUS, MIDPOINT);
 		this.gameBoard.setAudioPlayer(new AudioPlayer());
 		this.gameBoard.setVideoPlayer(new VideoPlayer());
 		widthProperty().set(size.getWidth());
 		heightProperty().set(size.getHeight());
-		this.mouseSteering = new MouseSteering(this.gameBoard.getPlayerCar(), this);
+		this.mouseSteering = new MouseSteering(this.gameBoard.getPlayerCar());
 //		this.addEventHandler(MouseEvent.MOUSE_MOVED, (MouseEvent moveEvent) -> {
 //			this.mouseSteering.mouseMoved(moveEvent);
 //		});
@@ -110,6 +110,12 @@ public class GameBoardUI extends Canvas {
 		this.imageCache = new HashMap<>();
 		for (Car car : this.gameBoard.getCars()) {
 			// Loads the image into the cache
+			getImage(car.getIconLocation());
+		}
+		for (Car car : this.gameBoard.getBallParticles()) {
+			getImage(car.getIconLocation());
+		}
+		for (Car car : this.gameBoard.getVortexCars()) {
 			getImage(car.getIconLocation());
 		}
 		String playerImageLocation = this.gameBoard.getPlayerCar().getIconLocation();

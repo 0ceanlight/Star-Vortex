@@ -3,7 +3,6 @@ package de.tum.in.ase.eist.usercontrol;
 import de.tum.in.ase.eist.Point2D;
 import de.tum.in.ase.eist.car.BallCar;
 import de.tum.in.ase.eist.car.Car;
-import de.tum.in.ase.eist.gameview.GameBoardUI;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -16,25 +15,20 @@ public class MouseSteering {
 
 	// lol!
 	private final Car userCar;
-	private final GameBoardUI gameBoardUI;
 
 	/**
 	 * Creates a MouseSteering instance for a specific GameBoardUI and a car that
 	 * the user needs to steer with their mouse.
 	 *
 	 * @param userCar     the car that should be steered by the user
-	 * @param gameBoardUI
 	 */
-	public MouseSteering(Car userCar, GameBoardUI gameBoardUI) {
+	public MouseSteering(Car userCar) {
 		this.userCar = userCar;
-		this.gameBoardUI = gameBoardUI;
 	}
 
-	public void mouseMoved(MouseEvent moveEvent) {
-		Double mpX = GameBoardUI.MIDPOINT.getX();
-		Double mpY = GameBoardUI.MIDPOINT.getY();
-
-		int fxRad = GameBoardUI.EFFECTIVE_RADIUS;
+	public void mouseMoved(MouseEvent moveEvent, Point2D midPoint, int fxRad) {
+		Double mpX = midPoint.getX();
+		Double mpY = midPoint.getY();
 
 		Point2D mousePos = new Point2D(moveEvent.getX() - mpX, moveEvent.getY() - mpY);
 		// a hint of linear algebra
@@ -51,9 +45,6 @@ public class MouseSteering {
 				radialPos = ANGLE_360_DEG + radialPos;
 			}
 			bc.setRadialPos(radialPos);
-			if (!gameBoardUI.getGameBoard().isRunning()) {
-				gameBoardUI.paint();
-			}
 		}
 	}
 

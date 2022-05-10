@@ -2,11 +2,13 @@ package de.tum.in.ase.eist.car;
 
 import de.tum.in.ase.eist.Dimension2D;
 import de.tum.in.ase.eist.Point2D;
-import de.tum.in.ase.eist.gameview.GameBoardUI;
 
 public class BallParticle extends Car {
+
+    // TODO Add Sparkle.png to resources
     private static final String BALL_PARTICLE_IMAGE_FILE = "sparkle.png";
     private Point2D position;
+    private Point2D midPoint;
     private static final Double SPEED = 1.05;
     public static final int SIZE = 13;
 
@@ -24,22 +26,21 @@ public class BallParticle extends Car {
      *
      * @param gameBoardSize dimensions of the game board
      */
-    public BallParticle(Dimension2D gameBoardSize, Point2D position) {
+    public BallParticle(Dimension2D gameBoardSize, Point2D position, Point2D midPoint) {
         super(gameBoardSize);
         this.setSize(new Dimension2D(SIZE, SIZE));
         this.position = position;
+        this.midPoint = midPoint;
         setIconLocation(BALL_PARTICLE_IMAGE_FILE);
     }
 
     @Override
     public void drive(Dimension2D gameBoardSize) {
-        Point2D midPt = GameBoardUI.MIDPOINT;
-
-        Double x = (position.getX() - midPt.getX()) * SPEED + midPt.getX();
-        Double y = (position.getY() - midPt.getY()) * SPEED + midPt.getY();
+        Double x = (position.getX() - midPoint.getX()) * SPEED + midPoint.getX();
+        Double y = (position.getY() - midPoint.getY()) * SPEED + midPoint.getY();
 
 //        if ((x < 0 || x > this.getSize().getWidth()) || (y < 0 || y > this.getSize().getHeight())) {
-        if (x < 0 || x > GameBoardUI.DEFAULT_WIDTH || y < 0 || y > GameBoardUI.DEFAULT_HEIGHT) {
+        if (x < 0 || x > gameBoardSize.getWidth() || y < 0 || y > gameBoardSize.getHeight()) {
             this.isOnBoard = false;
         }
 
