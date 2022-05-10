@@ -10,14 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
-import java.io.File;
 
 /**
  * Starts the Bumpers Application, loads the GameToolBar and GameBoardUI. This
@@ -40,7 +33,7 @@ public class BumpersApplication extends Application {
 	 */
 	@Override
 	public void start(Stage primaryStage) {
-		// the tool bar object with start and stop buttons
+		// the toolbar object with start and stop buttons
 		GameToolBar toolBar = new GameToolBar();
 		GameBoardUI gameBoardUI = new GameBoardUI(toolBar);
 		toolBar.initializeActions(gameBoardUI);
@@ -63,7 +56,14 @@ public class BumpersApplication extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.setOnCloseRequest(closeEvent -> gameBoardUI.stopGame());
 		primaryStage.show();
-		showAsyncAlert("Welcome to the Space Vortex\n\nYour mission is to successfully guide the orb through the rings\nand avoid enemy spaceships on the way\n - avoid the vortex rings\n - hit enemies on the right\n - control the orb by moving your mouse\n - here we go...");
+		String introMsg = "Welcome to the Space Vortex\n\n";
+		introMsg += "Your mission is to successfully guide the orb through the rings\nand avoid enemy spaceships on the way.\n\n";
+		introMsg += " - avoid the vortex rings\n";
+		introMsg += " - hit enemies on the right\n";
+		introMsg += " - control the orb by moving your mouse\n";
+		introMsg += " - here we go...";
+		introMsg += "\n\n• Created by Oceanlight in collaboration with Palmcaster Studios •";
+		showAsyncAlert(introMsg);
 	}
 
 	private void showAsyncAlert(String message) {

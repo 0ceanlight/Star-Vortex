@@ -7,7 +7,6 @@ import javafx.scene.control.Button;
 import javafx.scene.text.Text;
 
 import java.awt.*;
-import java.awt.Label;
 import java.util.Optional;
 
 /**
@@ -19,7 +18,7 @@ public class GameToolBar extends ToolBar {
 	private final Text score;
 //	private final Text highScore;
 
-	private final int BACKGROUND_COLOR = Color.TRANSLUCENT;
+//	private final int BACKGROUND_COLOR = Color.TRANSLUCENT;
 
 	public GameToolBar() { // (int highScore) {
 		this.start = new Button("Start");

@@ -11,11 +11,10 @@ import javafx.scene.input.MouseEvent;
  * steering of the user's car.
  */
 public class MouseSteering {
+	private static final int ANGLE_180_DEG = 180;
+	private static final int ANGLE_360_DEG = 360;
 
 	// lol!
-	private static final int ANGLE_90_DEGREES = 90;
-	private static final int ANGLE_270_DEGREES = 270;
-
 	private final Car userCar;
 	private final GameBoardUI gameBoardUI;
 
@@ -32,17 +31,24 @@ public class MouseSteering {
 	}
 
 	public void mouseMoved(MouseEvent moveEvent) {
+		Double mpX = GameBoardUI.MIDPOINT.getX();
+		Double mpY = GameBoardUI.MIDPOINT.getY();
 
-		Point2D mousePos = new Point2D(moveEvent.getX() - GameBoardUI.MIDPOINT.getX(), moveEvent.getY() - GameBoardUI.MIDPOINT.getY());
+		int fxRad = GameBoardUI.EFFECTIVE_RADIUS;
+
+		Point2D mousePos = new Point2D(moveEvent.getX() - mpX, moveEvent.getY() - mpY);
 		// a hint of linear algebra
 		int hyp = (int) Math.sqrt(mousePos.getX() * mousePos.getX() + mousePos.getY() * mousePos.getY());
 
-		userCar.setPosition(GameBoardUI.EFFECTIVE_RADIUS * mousePos.getX() / hyp + GameBoardUI.MIDPOINT.getX(), GameBoardUI.EFFECTIVE_RADIUS * mousePos.getY() / hyp + GameBoardUI.MIDPOINT.getY());
+		userCar.setPosition(fxRad * mousePos.getX() / hyp + mpX, fxRad * mousePos.getY() / hyp + mpY);
 
 		if (userCar instanceof BallCar bc) {
-			int radialPos = (int) (Math.atan2(-(userCar.getPosition().getY() - GameBoardUI.MIDPOINT.getY()), userCar.getPosition().getX() - GameBoardUI.MIDPOINT.getX()) * 180 / Math.PI);
+			Double posX = userCar.getPosition().getX();
+			Double posY = userCar.getPosition().getY();
+
+			int radialPos = (int) (Math.atan2(-(posY - mpY), posX - mpX) * ANGLE_180_DEG / Math.PI);
 			if (radialPos < 0) {
-				radialPos = 360 + radialPos;
+				radialPos = ANGLE_360_DEG + radialPos;
 			}
 			bc.setRadialPos(radialPos);
 			if (!gameBoardUI.getGameBoard().isRunning()) {

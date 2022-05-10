@@ -14,8 +14,6 @@ public class VideoPlayer implements VideoPlayerInterface {
 
     private static final String VIDEO_PATH = "hyper-vortex.mp4";
 
-    private static final double VIDEO_VOLUME = 0.5;
-
     private MediaPlayer videoPlayer;
     private final MediaView mediaView;
 

@@ -1,10 +1,5 @@
 package de.tum.in.ase.eist.gameview;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import de.tum.in.ase.eist.Dimension2D;
 import de.tum.in.ase.eist.GameBoard;
 import de.tum.in.ase.eist.GameOutcome;
@@ -22,6 +17,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * This class implements the user interface for steering the player car. The
  * user interface is implemented as a Thread that is started by clicking the
@@ -29,7 +29,6 @@ import javafx.scene.shape.ArcType;
  */
 public class GameBoardUI extends Canvas {
 
-	private static final Color BACKGROUND_COLOR = Color.TRANSPARENT;
 	/**
 	 * The update period of the game in ms, this gives us 25 fps.
 	 */
@@ -37,6 +36,8 @@ public class GameBoardUI extends Canvas {
 	public static final int DEFAULT_WIDTH = 950;
 	public static final int DEFAULT_HEIGHT = 600;
 	private static final Dimension2D DEFAULT_SIZE = new Dimension2D(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	public static final int ANGLE_360 = 360;
+
 
 	// vortex attributes
 	public static final int EFFECTIVE_RADIUS = DEFAULT_HEIGHT / 3;
@@ -86,7 +87,6 @@ public class GameBoardUI extends Canvas {
 		this.addEventHandler(MouseEvent.MOUSE_MOVED, (MouseEvent moveEvent) -> {
 			this.mouseSteering.mouseMoved(moveEvent);
 		});
-//		paint();
 	}
 
 	private void setupGameBoard() {
@@ -180,8 +180,11 @@ public class GameBoardUI extends Canvas {
 			if (this.gameBoard.getGameOutcome() == GameOutcome.LOST) {
 				showAsyncAlert("Game over!\nScore: " + gameBoard.getScore());
 				this.stopGame();
-			} else if (this.gameBoard.getGameOutcome() == GameOutcome.WON) {
-				showAsyncAlert("Congrats! You won!!");
+			} else if (this.gameBoard.getGameOutcome() == GameOutcome.WON_CRUNCHED_OTHERS) {
+				showAsyncAlert("Congrats! You won by destroying all other spaceships!");
+				this.stopGame();
+			} else if (this.gameBoard.getGameOutcome() == GameOutcome.WON_CRASHED_RINGS) {
+				showAsyncAlert("Congrats! You won by making it through the vortex!!");
 				this.stopGame();
 			}
 			paint();
@@ -205,11 +208,11 @@ public class GameBoardUI extends Canvas {
 	 */
 	public void paint() {
 		getGraphicsContext2D().clearRect(0, 0, getWidth(), getHeight());
-		getGraphicsContext2D().setFill(BACKGROUND_COLOR);
+		getGraphicsContext2D().setFill(Color.TRANSPARENT);
 		getGraphicsContext2D().fillRect(0, 0, getWidth(), getHeight());
 
 		for (Car ballParticle : this.gameBoard.getBallParticles()) {
-			paintBallParticle(ballParticle);
+			paintCar(ballParticle);
 		}
 
 		for (Car vortexCar : this.gameBoard.getVortexCars()) {
@@ -245,20 +248,20 @@ public class GameBoardUI extends Canvas {
 				carPosition.getY() - h / 2, w, h);
 	}
 
-	private void paintBallParticle(Car car) {
-		Point2D pos = car.getPosition();
-		this.getGraphicsContext2D().setStroke(Color.WHITE);
-
-//		System.out.println(pos.getY() + " " + pos.getX());
-		this.getGraphicsContext2D().strokeArc(pos.getX(), pos.getY(), 2.4, 2.4, 0, 360, ArcType.OPEN);
-	}
+//	private void paintBallParticle(Car car) {
+//		Point2D pos = car.getPosition();
+//		this.getGraphicsContext2D().setStroke(Color.WHITE);
+//
+////		this.getGraphicsContext2D().strokeArc(pos.getX(), pos.getY(), 2.4, 2.4, 0, 360, ArcType.ROUND);
+//
+//	}
 
 	private void paintVortexCar(Car car) {
 		if (car instanceof VortexCar vortexCar) {
-			Point2D carPosition = car.getPosition();
-			int r = vortexCar.getRadius();
-
-			drawRingSegment((int) MIDPOINT.getX(), (int) MIDPOINT.getY(), vortexCar.getRadius(), vortexCar.getStartAngle(), vortexCar.getEndAngle(), vortexCar.getWidth(), vortexCar.getColor());
+			Color c = new Color(1.0, 1.0, 1.0, 1.0);
+			int mpX = (int) MIDPOINT.getX();
+			int mpY = (int) MIDPOINT.getY();
+			drawRingSegment(mpX, mpY, vortexCar.getRadius(), vortexCar.getStartAngle(), vortexCar.getEndAngle(), vortexCar.getWidth(), c);
 		}
 	}
 
@@ -266,7 +269,8 @@ public class GameBoardUI extends Canvas {
 		this.getGraphicsContext2D().setLineWidth(width);
 		this.getGraphicsContext2D().setStroke(color);
 
-		this.getGraphicsContext2D().strokeArc(x - radius, y - radius, radius * 2, radius * 2, startAngle, angleLength(startAngle, endAngle), ArcType.OPEN);
+		Double al = angleLength(startAngle, endAngle);
+		this.getGraphicsContext2D().strokeArc(x - radius, y - radius, radius * 2, radius * 2, startAngle, al, ArcType.OPEN);
 	}
 
 	private Double angleLength(Double startAngle, Double endAngle) {
@@ -274,7 +278,7 @@ public class GameBoardUI extends Canvas {
 		if (startAngle < endAngle) {
 			length = endAngle - startAngle;
 		} else {
-			length = endAngle + (360 - startAngle);
+			length = endAngle + (ANGLE_360 - startAngle);
 		}
 		return length;
 	}

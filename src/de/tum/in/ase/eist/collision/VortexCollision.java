@@ -30,8 +30,9 @@ public class VortexCollision extends Collision {
         if (vortexCar.getStartAngle() < vortexCar.getEndAngle()) {
             hasCollided = ballCar.getRadialPos() >= vortexCar.getStartAngle() && ballCar.getRadialPos() <= vortexCar.getEndAngle();
         } else {
+            Double bPos = ballCar.getRadialPos() - BallCar.RADIAL_BALL_WIDTH / 2;
             // check interval around angle 0
-            hasCollided = (ballCar.getRadialPos() - BallCar.RADIAL_BALL_WIDTH / 2) <= vortexCar.getEndAngle() || (ballCar.getRadialPos() + BallCar.RADIAL_BALL_WIDTH / 2) >= vortexCar.getStartAngle();
+            hasCollided = bPos <= vortexCar.getEndAngle() || bPos >= vortexCar.getStartAngle();
         }
         // 2: vortex radius passed through ball radius
         hasCollided &= vortexCar.getPrevRadius() <= ballCar.getRadius() && vortexCar.getRadius() >= ballCar.getRadius();

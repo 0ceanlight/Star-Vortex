@@ -6,16 +6,14 @@ import de.tum.in.ase.eist.gameview.GameBoardUI;
 public class BallCar extends Car {
     private static final String BALL_CAR_IMAGE_FILE = "LightOrb.gif";
 
-    private static final int MIN_SPEED_FAST_CAR = 2;
-    private static final int MAX_SPEED_FAST_CAR = 10;
-
     private int radialPos = 0;
-    private final int radius = GameBoardUI.EFFECTIVE_RADIUS;
+    private static final int RADIUS = GameBoardUI.EFFECTIVE_RADIUS;
     public static final Double RADIAL_BALL_WIDTH = 15.0;
+    public static final int SIZE = 38;
 
     public BallCar(Dimension2D gameBoardSize) {
         super(gameBoardSize);
-        setSize(new Dimension2D(35, 35));
+        setSize(new Dimension2D(SIZE, SIZE));
         setIconLocation(BALL_CAR_IMAGE_FILE);
     }
 
@@ -28,6 +26,6 @@ public class BallCar extends Car {
     }
 
     public int getRadius() {
-        return radius;
+        return RADIUS;
     }
 }

@@ -1,35 +1,44 @@
 package de.tum.in.ase.eist;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import de.tum.in.ase.eist.audio.AudioPlayerInterface;
 import de.tum.in.ase.eist.car.*;
+import de.tum.in.ase.eist.collision.Collision;
+import de.tum.in.ase.eist.collision.DefaultCollision;
 import de.tum.in.ase.eist.collision.VortexCollision;
 import de.tum.in.ase.eist.gameview.GameBoardUI;
 import de.tum.in.ase.eist.video.VideoPlayerInterface;
-import de.tum.in.ase.eist.collision.Collision;
-import de.tum.in.ase.eist.collision.DefaultCollision;
-import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Creates all car objects, detects collisions, updates car positions, notifies
  * player about victory or defeat.
  */
 public class GameBoard {
+	private static final int PTS_PER_SHIP = 3;
+	private static final int CAR_INFREQUENCY = 6; // higher - less frequent, >= 1
+	private static final Double ANGLE_360_DEG = 360.0;
+	private static final int PARTICLE_FREQUENCY = 5;
+	private static final int BEGIN_AFTER = 3;
+	private static final int END_BEFORE = 3;
 
-	private final int VORTEX_SPACING = 40;
+	private static final int SCORE_TO_WIN = 12;
+	private static final int VORTEX_SPACING = 40;
 	private static final int NUMBER_OF_SLOW_CARS = 3;
-	private static int numSlowCars = 0;
+	private int numSlowCars = 0;
 
 	private static final int NUMBER_OF_TESLA_CARS = 2;
-	private static int numTeslaCars = 0;
+	private int numTeslaCars = 0;
 
 	private static final int MAX_VORTEX_CARS_PER_RING = 6;
 	private static final int MIN_VORTEX_CARS_PER_RING = 2;
 	private static final Double MIN_VORTEX_SPACING = 4 * BallCar.RADIAL_BALL_WIDTH;
 	private static final Double MIN_VORTEX_LENGTH = 2 * BallCar.RADIAL_BALL_WIDTH;
+
+	private static final Random RANDY = new Random();
+
 
 	private int score = 0;
 //	private int highScore = 0;
@@ -95,49 +104,61 @@ public class GameBoard {
 	 * them to the cars list.
 	 */
 	private void createCars() {
-		if (gameTick % 5 == 0) {
+		// ball particles
+		if (gameTick % PARTICLE_FREQUENCY == 0) {
 			ballParticles.add(new BallParticle(this.size, player.getCar().getPosition()));
 		}
 
 		if (gameTick % VORTEX_SPACING == 0) {
-			if (gameTick >= VORTEX_SPACING * 2) {
+			if (gameTick >= VORTEX_SPACING * BEGIN_AFTER) {
 				score++;
 //				if (score > highScore) {
 //					highScore = score;
 //				}
 			}
 
-			switch (randomInt(0, 5)) {
-				case 0:
-					if (numSlowCars < NUMBER_OF_SLOW_CARS) {
-						this.cars.add(new SlowCar(this.size));
-						numSlowCars++;
-					}
-					break;
-				case 1:
-					if (numTeslaCars < NUMBER_OF_TESLA_CARS) {
-						this.cars.add(new FastCar(this.size));
-						numTeslaCars++;
-					}
-			}
-
-			if (gameTick >= VORTEX_SPACING * 2) {
+			if (score + END_BEFORE < SCORE_TO_WIN && gameTick >= VORTEX_SPACING * 2) {
 				addVortexCar();
 			}
+
+			generateSpaceships();
+		}
+	}
+
+	private void generateSpaceships() {
+		switch (randomInt(0, CAR_INFREQUENCY)) {
+			case 0:
+				if (numSlowCars < NUMBER_OF_SLOW_CARS) {
+					this.cars.add(new SlowCar(this.size));
+					numSlowCars++;
+				}
+				break;
+			case 1:
+				if (numTeslaCars < NUMBER_OF_TESLA_CARS) {
+					this.cars.add(new FastCar(this.size));
+					numTeslaCars++;
+				}
+				break;
+			default:
+				break;
 		}
 	}
 
 	public void addVortexCar() {
-		Double modifier = randomDouble(0.0, 359.0);
+		Double modifier = randomDouble(0.0, ANGLE_360_DEG - 1);
 		Double startAngle = 0.0;
-		Double endAngle = 360.0 - MIN_VORTEX_SPACING;
+		Double endAngle = ANGLE_360_DEG - MIN_VORTEX_SPACING;
 
 		for (int i = 0; i < MAX_VORTEX_CARS_PER_RING; i++) {
 			if (i < MIN_VORTEX_CARS_PER_RING || randomInt(0, 1) == 1) {
 				if (startAngle + MIN_VORTEX_LENGTH <= endAngle) {
 					Double len = randomDouble(MIN_VORTEX_LENGTH, angleLength(startAngle, endAngle));
 					Double newEnd = startAngle + len;
-					this.vortexCars.add(new VortexCar(this.size, Color.WHITE, (startAngle + modifier) % 360, (newEnd + modifier) % 360));
+
+					Double sa = (startAngle + modifier) % ANGLE_360_DEG;
+					Double ea = (newEnd + modifier) % ANGLE_360_DEG;
+
+					this.vortexCars.add(new VortexCar(this.size, sa, ea));
 					startAngle += len;
 				} else {
 					break;
@@ -152,21 +173,18 @@ public class GameBoard {
 		if (startAngle < endAngle) {
 			length = endAngle - startAngle;
 		} else {
-			length = endAngle + (360 - startAngle);
+			length = endAngle + (ANGLE_360_DEG - startAngle);
 		}
 		return length;
 	}
 
 	// random number, inclusive
 	public Double randomDouble(Double from, Double to) {
-		Random randy = new Random();
-
-		return randy.nextDouble(from, to + 1);
+		return RANDY.nextDouble(from, to + 1);
 	}
 
 	public int randomInt(int from, int to) {
-		Random randy = new Random();
-		return randy.nextInt(from, to - from + 1);
+		return RANDY.nextInt(from, to - from + 1);
 	}
 
 	public Dimension2D getSize() {
@@ -234,7 +252,14 @@ public class GameBoard {
 	 * Updates the position of each car.
 	 */
 	public void update() {
+		gameTick++;
+
 		moveCars();
+
+		if (score >= SCORE_TO_WIN) {
+			stopGame();
+			gameOutcome = GameOutcome.WON_CRASHED_RINGS;
+		}
 	}
 
 	/**
@@ -245,6 +270,9 @@ public class GameBoard {
 		playVideo();
 		playMusic();
 		this.running = true;
+		this.getCars().clear();
+		numSlowCars = 0;
+		numTeslaCars = 0;
 	}
 
 	/**
@@ -255,7 +283,6 @@ public class GameBoard {
 		stopMusic();
 		this.running = false;
 
-		this.getCars().clear();
 		numSlowCars = 0;
 		numTeslaCars = 0;
 	}
@@ -297,14 +324,13 @@ public class GameBoard {
 	 * Moves all cars on this game board one step further.
 	 */
 	public void moveCars() {
-		gameTick++;
 		createCars();
 
 		for (int i = 0; i < ballParticles.size(); i++) {
 			BallParticle bp = ballParticles.get(i);
 
 			if (bp.isOnBoard()) {
-				bp.move();
+				bp.drive(this.size);
 			} else {
 				ballParticles.remove(bp);
 				i--;
@@ -350,17 +376,10 @@ public class GameBoard {
 		for (int i = 0; i < cars.size(); i++) {
 			Car car = cars.get(i);
 
-			if (car.isCrunched()) {
-				// because there is no need to check for a collision
-				continue;
-			}
-
-			// TODO Backlog Item 16: Add a new collision type
-			/*
-			 * Hint: Make sure to create a subclass of the class Collision and store it in
-			 * the new Collision package. Create a new collision object and check if the
-			 * collision between player car and autonomous car evaluates as expected
-			 */
+//			if (car.isCrunched()) {
+//				// because there is no need to check for a collision
+//				continue;
+//			}
 
 			Collision collision = new DefaultCollision(player.getCar(), car);
 
@@ -372,17 +391,11 @@ public class GameBoard {
 
 				this.audioPlayer.playCrashSound();
 
-				// TODO Backlog Item 11: The loser car is crunched and stops driving
 				loser.crunch();
 
-				// TODO Backlog Item 11: The player gets notified when he looses or wins the game
-				/*
-				 * Hint: you should set the attribute gameOutcome accordingly. Use 'isWinner()'
-				 * below for your implementation
-				 */
 				if (isWinner()) {
 					stopGame();
-					gameOutcome = GameOutcome.WON;
+					gameOutcome = GameOutcome.WON_CRUNCHED_OTHERS;
 				}
 
 				if (getPlayerCar().isCrunched()) {
@@ -390,7 +403,7 @@ public class GameBoard {
 					gameOutcome = GameOutcome.LOST;
 				} else {
 					cars.remove(loser);
-					this.score += 3;
+					this.score += PTS_PER_SHIP;
 					i--;
 				}
 			}
@@ -403,16 +416,11 @@ public class GameBoard {
 	 * @return true if the game is over and the player won, false otherwise
 	 */
 	private boolean isWinner() {
-		if (numTeslaCars < NUMBER_OF_TESLA_CARS || numSlowCars < NUMBER_OF_SLOW_CARS) {
-			return false;
+		if (cars.isEmpty() && numTeslaCars == NUMBER_OF_TESLA_CARS && numSlowCars == NUMBER_OF_SLOW_CARS) {
+			return true;
 		}
 
-		for (Car car : getCars()) {
-			if (!car.isCrunched()) {
-				return false;
-			}
-		}
-		return true;
+		return false;
 	}
 
 	private void printWinner(Car winner) {

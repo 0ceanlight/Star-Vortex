@@ -5,6 +5,7 @@ package de.tum.in.ase.eist;
  */
 public enum GameOutcome {
 	OPEN,
-	WON,
+	WON_CRUNCHED_OTHERS,
+	WON_CRASHED_RINGS,
 	LOST;
 }
