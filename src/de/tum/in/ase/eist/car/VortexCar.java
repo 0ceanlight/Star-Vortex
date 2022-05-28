@@ -1,7 +1,6 @@
 package de.tum.in.ase.eist.car;
 
 import de.tum.in.ase.eist.Dimension2D;
-import de.tum.in.ase.eist.gameview.GameBoardUI;
 
 public class VortexCar extends Car {
 
@@ -11,17 +10,18 @@ public class VortexCar extends Car {
     private double width = 1.0;
 
     private int prevRadius = 0;
-    private int radius = GameBoardUI.FADE_IN_RADIUS;
+    private int radius;
     private final Double startAngle;
     private final Double endAngle;
     private final Double widthMod = 15000.0;
     private final Double radMod = 100.0;
 
-    public VortexCar(Dimension2D gameBoardSize, Double startAngle, Double endAngle) {
+    public VortexCar(Dimension2D gameBoardSize, Double startAngle, Double endAngle, int fadeInRadius) {
         super(gameBoardSize);
 //        this.color = color;
         this.startAngle = startAngle;
         this.endAngle = endAngle;
+        this.radius = fadeInRadius;
     }
 
     @Override

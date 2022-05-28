@@ -5,7 +5,6 @@ import de.tum.in.ase.eist.car.*;
 import de.tum.in.ase.eist.collision.Collision;
 import de.tum.in.ase.eist.collision.DefaultCollision;
 import de.tum.in.ase.eist.collision.VortexCollision;
-import de.tum.in.ase.eist.gameview.GameBoardUI;
 import de.tum.in.ase.eist.video.VideoPlayerInterface;
 
 import java.util.ArrayList;
@@ -39,6 +38,10 @@ public class GameBoard {
 
 	private static final Random RANDY = new Random();
 
+
+	private final int EFFECTIVE_RADIUS;
+	private final int FADE_IN_RADIUS;
+	private final Point2D MIDPOINT;
 
 	private int score = 0;
 //	private int highScore = 0;
@@ -89,11 +92,14 @@ public class GameBoard {
 	 *
 	 * @param size of the game board
 	 */
-	public GameBoard(Dimension2D size) {
+	public GameBoard(Dimension2D size, int radius, int fadeInRadius, Point2D midPoint) {
 //		this.videoPlayer = new VideoPlayer();
 		this.size = size;
+		this.EFFECTIVE_RADIUS = radius;
+		this.FADE_IN_RADIUS = fadeInRadius;
+		this.MIDPOINT = midPoint;
 //		FastCar playerCar = new FastCar(size);
-		BallCar playerCar = new BallCar(size);
+		BallCar playerCar = new BallCar(size, EFFECTIVE_RADIUS);
 		this.player = new Player(playerCar);
 		this.player.setup();
 		createCars();
@@ -106,7 +112,7 @@ public class GameBoard {
 	private void createCars() {
 		// ball particles
 		if (gameTick % PARTICLE_FREQUENCY == 0) {
-			ballParticles.add(new BallParticle(this.size, player.getCar().getPosition()));
+			ballParticles.add(new BallParticle(this.size, player.getCar().getPosition(), MIDPOINT));
 		}
 
 		if (gameTick % VORTEX_SPACING == 0) {
@@ -158,7 +164,7 @@ public class GameBoard {
 					Double sa = (startAngle + modifier) % ANGLE_360_DEG;
 					Double ea = (newEnd + modifier) % ANGLE_360_DEG;
 
-					this.vortexCars.add(new VortexCar(this.size, sa, ea));
+					this.vortexCars.add(new VortexCar(this.size, sa, ea, FADE_IN_RADIUS));
 					startAngle += len;
 				} else {
 					break;
@@ -345,7 +351,7 @@ public class GameBoard {
 		for (int i = 0; i < vortexCars.size(); i++) {
 			if (vortexCars.get(i) instanceof VortexCar car) {
 				car.drive(size);
-				if (car.getRadius() >= GameBoardUI.DEFAULT_WIDTH) {
+				if (car.getRadius() >= size.getWidth()) {
 					vortexCars.remove(car);
 					i--;
 				}
